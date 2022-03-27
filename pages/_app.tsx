@@ -306,6 +306,16 @@ function MyApp({ Component, pageProps }) {
                             <a>MarketPlace</a>
                           </Link>
                         </li>
+                        <li>
+                      <a href="#">About<span></span></a>
+                      <ul>
+                        <li><a href="#">Our Team</a></li>
+                        <li><a href="#">See FAQ</a></li>
+                        <li><a href="#">Careers</a></li>
+                        <li><a href="#">Twitter</a></li>
+                        <li><a href="#">Discord</a></li>
+                      </ul>
+                    </li>
                       </ul>
                       <div className="menu_side_area">
                         <div className="de-login-menu">
