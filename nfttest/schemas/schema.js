@@ -46,12 +46,12 @@ export default createSchema({
           {
             name: 'profileImage',
             title: 'Profile Image',
-            type: 'image',
+            type: 'string',
           },
           {
             name: 'bannerImage',
             title: 'Banner Image',
-            type: 'image',
+            type: 'string',
           },
           {
             name: 'twitterHandle',

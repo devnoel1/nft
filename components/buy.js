@@ -2,7 +2,7 @@ import { ethers } from "ethers";
 import { useEffect, useState, useContext } from "react";
 import axios from "axios";
 import Web3Modal from "web3modal";
-import { ConnectionContext } from '../context/context';
+import { WalletContext } from "../context/WalletContext"
 import { useRouter } from 'next/router';
 import Swal from 'sweetalert2'
 
@@ -12,7 +12,7 @@ import { NFT, Market } from '../util/constant';
 
 
 const BuyNFT = ({nft}) => {
-    const connector = useContext(ConnectionContext);
+    const connector = useContext(WalletContext);
     const router = useRouter()
     
     async function buyNft(nft) {

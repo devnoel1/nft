@@ -4,7 +4,6 @@ import { useEffect, useState, useContext } from 'react'
 import axios from 'axios'
 import { useRouter } from 'next/router'
 import Web3Modal from "web3modal";
-import { ConnectionContext } from '../../context/context';
 import Swal from 'sweetalert2'
 
 import {

@@ -7,6 +7,36 @@ import Sold from '../components/sold';
 import Created from '../components/created';
 
 export default function Dashboard() {
+  const [openMenu, setOpenMenu] = useState(true);
+  const [openMenu1, setOpenMenu1] = useState(false);
+  const [openMenu2, setOpenMenu2] = useState(false);
+
+  const handleBtnClick = () => {
+    setOpenMenu(!openMenu);
+    setOpenMenu1(false);
+    setOpenMenu2(false);
+    document.getElementById("Mainbtn").classList.add("active");
+    document.getElementById("Mainbtn1").classList.remove("active");
+    document.getElementById("Mainbtn2").classList.remove("active");
+  };
+  const handleBtnClick1 = () => {
+    setOpenMenu1(!openMenu1);
+    setOpenMenu2(false);
+    setOpenMenu(false);
+    document.getElementById("Mainbtn1").classList.add("active");
+    document.getElementById("Mainbtn").classList.remove("active");
+    document.getElementById("Mainbtn2").classList.remove("active");
+  };
+  const handleBtnClick2 = () => {
+    setOpenMenu2(!openMenu2);
+    setOpenMenu(false);
+    setOpenMenu1(false);
+    document.getElementById("Mainbtn2").classList.add("active");
+    document.getElementById("Mainbtn").classList.remove("active");
+    document.getElementById("Mainbtn1").classList.remove("active");
+  };
+  
+
   return (
     <>
       <section
@@ -51,23 +81,37 @@ export default function Dashboard() {
             <div className="col-md-12">
               <div className="de_tab tab_simple">
                 <ul className="de_nav">
-                  <li className="active"><span>Assets</span></li>
-                  <li><span>Created</span></li>
-                  <li><span>Sold</span></li>
+                  <li id='Mainbtn' className="active"><span onClick={handleBtnClick}>Assets</span></li>
+                  <li id='Mainbtn1' className=""><span onClick={handleBtnClick1}>Created</span></li>
+                  <li id='Mainbtn2' className=""><span onClick={handleBtnClick2}>Sold</span></li>
                 </ul>
 
-                <div className="de_tab_content">
-                  <div className="tab-1 active">
+                <div className="py-3">
+                  {openMenu &&(
+                    <div className="onStep fadeIn">
                     <MyAssets/>
+                   
                   </div>
+                  )
+                  }
 
-                  <div className="tab-2">
+                 {
+                   openMenu1 && (
+                    <div className="onStep fadeIn">
                     <Created/>
+                  
                   </div>
+                   )
+                 }
 
-                  <div className="tab-3">
+                  {
+                    openMenu2 && (
+                      <div className="onStep fadeIn">
                       <Sold/>
+                      
                   </div>
+                    )
+                  }
                 </div>
               </div>
             </div>

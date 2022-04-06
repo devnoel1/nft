@@ -931,8 +931,8 @@ header.header-mobile.header-light #menu-btn {
 
 .de-submenu {
   text-align: left;
-  opacity: 0;
-  display: none;
+  opacity: 1;
+  display: block;
   position: absolute;
   right: 0;
   background: #ffffff;
@@ -946,10 +946,10 @@ header.header-mobile.header-light #menu-btn {
   z-index: 1000;
 }
 
-.dropmenu:hover .de-submenu {
+/* .dropmenu:hover .de-submenu {
   opacity: 1;
   display: block;
-}
+} */
 
 .dark-scheme .de-submenu {
   background: #161d30;

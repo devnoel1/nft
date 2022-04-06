@@ -3,16 +3,16 @@ import { useEffect, useState, useContext } from "react";
 import axios from "axios";
 import Web3Modal from "web3modal";
 import { WalletContext } from "../context/WalletContext";
-import NFTCard from "../components/nftCard";
-import ColumnItems from "../components/ColumnItems";
 
 //getting contract address
 import { nftaddress, nftmarketaddress } from "../config";
 
 //getting contract abis
 import { NFT, Market } from "../util/constant";
+import NFTCard from "./nftCard";
 
-export default function Marketplace() {
+const ColumnItems = () => {
+  const [nftSlice, setNftSlice] = useState([]);
   const [nfts, setNfts] = useState([]);
   const [filteredData, setFilteredData] = useState(nfts);
   const [loadingState, setLoadingState] = useState("not-loaded");
@@ -21,18 +21,6 @@ export default function Marketplace() {
     loadNFTs();
   }, []);
 
-  const handleSearch = (event) => {
-    let value = event.target.value;
-    let result = [];
-
-    result = nfts.filter((data) => {
-      if (value !== "") {
-        return data?.name?.toLowerCase()?.includes(value?.toLowerCase());
-      }
-      return data;
-    });
-    setFilteredData(result);
-  };
 
   async function loadNFTs() {
     /* create a generic provider and query for unsold market items */
@@ -69,37 +57,81 @@ export default function Marketplace() {
         return item;
       })
     );
+    // setNftSlice(items);
+    // const sliceData = nftSlice.slice(0, 8);
     setNfts(items);
     setFilteredData(items);
     setLoadingState("loaded");
   }
 
+  const handleSearch = (event) => {
+    let value = event.target.value;
+    let result = [];
+
+    result = nfts.filter((data)=>{
+      if (value !== "") {
+        return data?.name?.toLowerCase()?.includes(value?.toLowerCase())
+      }
+      return data
+    })
+    setFilteredData(result);
+  }
+
+  const loadMore = () => {
+    let nftState = filteredData;
+    let start = nftState.length;
+    let end = nftState.length + 4;
+    setFilteredData(nftSlice.slice(start, end));
+    setLoadingState("loaded");
+  };
+
   return (
     <>
-      <section
-        id="subheader"
-        className="text-light"
-        // data-bgimage="url(/images/background/subheader.jpg) top"
-        style={{ background: "url(/images/background/subheader.jpg) " }}
-      >
-        <div className="center-y relative text-center">
-          <div className="container">
-            <div className="row">
-              <div className="col-md-12 text-center">
-                <h1>Market Place</h1>
-              </div>
-              <div className="clearfix"></div>
-            </div>
+      <div className="items_filter">
+        <form
+          className="row form-dark"
+          id="form_quick_search"
+          method="post"
+          name="form_quick_search"
+        >
+          <div className="col text-center">
+            <input
+              className="form-control"
+              placeholder="search item here..."
+              type="text"
+              onChange={(event) => handleSearch(event)}
+            />
+            <span href="#" id="btn-submit">
+              <i className="fa fa-search bg-color-secondary"></i>
+            </span>
+            <div className="clearfix"></div>
           </div>
+        </form>
+      </div>
+      {loadingState === "loaded" && !filteredData.length ? (
+        <h4 className="py-10 px-20 text-3xl text-center text-warning">
+          no result found
+        </h4>
+      ) : (
+        <div className="row">
+          {filteredData.map((nft, i) => (
+            <NFTCard key={i} nft={nft} loadNFTs={loadNFTs} />
+          ))}
         </div>
-      </section>
-      <section aria-label="section">
-        <div className="container">
-          <div className="col-lg-12">
-            <ColumnItems />
-          </div>
+      )}
+      {/* {filteredData.length !== nftSlice.length && (
+        <div class="col-md-12 text-center">
+          <button
+            type="button"
+            onClick={() => loadMore()}
+            class="btn-main wow fadeInUp lead"
+          >
+            Load more
+          </button>
         </div>
-      </section>
+      )} */}
     </>
   );
-}
+};
+
+export default ColumnItems;

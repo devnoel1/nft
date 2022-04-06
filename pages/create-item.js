@@ -3,7 +3,7 @@ import { ethers } from 'ethers'
 import { create as ipfsHttpClient } from 'ipfs-http-client'
 import { useRouter } from 'next/router'
 import Web3Modal from 'web3modal';
-import { ConnectionContext } from '../context/context'
+import { WalletContext } from "../context/WalletContext"
 import Swal from 'sweetalert2'
 
 const client = ipfsHttpClient('https://ipfs.infura.io:5001/api/v0')
@@ -19,7 +19,7 @@ export default function CreateItem() {
   const [fileUrl, setFileUrl] = useState(null)
   const [formInput, updateFormInput] = useState({ price: '', name: '', description: '' })
   
-  const connection = useContext(ConnectionContext)
+  const connection = useContext(WalletContext)
   // const web3Provider = useContext(ConnectionContext);
   const router = useRouter()
 
