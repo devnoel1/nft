@@ -23,7 +23,7 @@
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx"
-, "components/layout.js", "context/WalletContext.js", "pages/_app.tsx"  ],
+, "components/layout.js", "context/WalletContext.js", "pages/_app.tsx", "db/index.ts", "db.ts", "pages/api/user/index.js"  ],
   "exclude": [
     "node_modules"
   ]

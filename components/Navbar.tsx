@@ -1,5 +1,5 @@
 import { WalletContext } from "../context/WalletContext";
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import useOnclickOutside from "react-cool-onclickoutside";
@@ -20,6 +20,7 @@ const Navbar = () => {
   const ref = useOnclickOutside(() => {
     closeMenu();
   });
+
 
   return (
     <header className="header-light scroll-light">
@@ -115,8 +116,8 @@ const Navbar = () => {
                           >
                             <img
                               src={
-                                currentUser
-                                  ? currentUser.profileImage
+                                currentUser && currentUser.profile_pics
+                                  ? currentUser.profile_pics
                                   : "/images/author_single/author-9.jpg"
                               }
                               className="img-fluid"
@@ -151,7 +152,7 @@ const Navbar = () => {
 
                               <ul className="de-submenu-profile">
                                 <li>
-                                  <Link href={"/profile"}>
+                                  <Link href={"/profile/"+address}>
                                     <a>
                                       <i className="fa fa-user"></i> My profile
                                     </a>
@@ -169,7 +170,7 @@ const Navbar = () => {
                                     href="javascript:void(0);"
                                     onClick={disconnect}
                                   >
-                                    <i className="fas fa-sign-out-alt"></i> Sign
+                                    <i className="fa fa-sign-out"></i> Sign
                                     out
                                   </a>
                                 </li>

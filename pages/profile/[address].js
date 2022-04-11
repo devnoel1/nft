@@ -1,68 +1,29 @@
 import { useState, useContext, useEffect } from "react";
 import { useRouter } from "next/router";
-import { client } from "../../lib/sanityClient";
 import { create as ipfsHttpClient } from "ipfs-http-client";
 import { WalletContext } from "../../context/WalletContext";
 import Swal from "sweetalert2";
 import axios from "axios";
+import prisma from '../../lib/prisma';
 
 const ipfs_client = ipfsHttpClient("https://ipfs.infura.io:5001/api/v0");
 
-export default function Profile() {
-  const [fileUrl, setFileUrl] = useState(null);
-  const [formInput, updateFormInput] = useState({
-    username: "",
-    email: "",
-    bio: "",
-    site_url: "",
-    twitter_username: "",
-    instagram_username: "",
-  });
-  const { address,currentUser} = useContext(WalletContext);
-  const [ userProfile, setUserProfile ] = useState({})
-
+export default function Profile({data}) {
+  const { address, currentUser } = useContext(WalletContext);
+  const [fileUrl, setFileUrl] = useState(data.profile_pics || null);
   const router = useRouter();
 
-  useEffect(()=>{
-    currentUserFun()
-  },[currentUserFun])
-
-  async function currentUserFun()
-  {
-    const query = `
-          *[_type == "users" && _id == "${address}"]{
-              userName,
-              walletAddress,
-              bio,
-              email,
-              siteUrl,
-              twitterHandle,
-              igHandle,
-              profileImage
-          }
-          `;
-      const res = await client.fetch(query);
-
-      // console.log(response)
-      
-    if (res.length) {
-      setUserProfile({
-        username: res[0].userName,
-        bio: res[0].bio,
-        email: res[0].email,
-        siteUrl: res[0].siteUrl,
-        twitterHandle: res[0].twitterHandle,
-        profileImage:res[0].profileImage,
-        igHandle: res[0].igHandle,
-      });
-
-      setFileUrl(res[0].profileImage)
-    }
-  }
+  const [formInput, updateFormInput] = useState({
+    username: data.username || "",
+    email: data.email || "",
+    bio: data.bio || "",
+    site_url: data.site_url || "",
+    twitter_username: data.twitterHandle || "",
+    instagram_username: data.igHandle || "",
+  });
 
   async function onProfileImage(e) {
     const file = e.target.files[0];
-
     try {
       const added = await ipfs_client.add(file, {
         progress: (prog) => console.log(`received: ${prog}`),
@@ -84,29 +45,41 @@ export default function Profile() {
       instagram_username,
     } = formInput;
 
-    if (!username || !email) return;
+    const user = await axios
+      .post("/api/user", {
+        id: address,
+        username: username,
+        email: email,
+        site_url: site_url,
+        bio: bio,
+        twitterHandle: twitter_username,
+        igHandle: instagram_username,
+        profile_pics: fileUrl,
+      })
+      .then(function (data) {
+        
+        if(data.status == 200)
+        {
+          Swal.fire({
+            title: "Successful!",
+            text: "Profile Updated successfuly",
+            icon: "success",
+            confirmButtonText: "Cool",
+          });
+        }else{
+          Swal.fire({
+            title: "Not Successful!",
+            text: "Something went wrong ",
+            icon: "error",
+            confirmButtonText: "Cool",
+          });
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+      });
 
-    const userDoc = {
-      _type: "users",
-      _id: address,
-      userName: username,
-      walletAddress: address,
-      bio: bio,
-      email: email,
-      siteUrl: site_url,
-      twitterHandle: twitter_username,
-      igHandle: instagram_username,
-      profileImage: fileUrl,
-    };
-
-    const result = await client.createOrReplace(userDoc);
-
-    Swal.fire({
-      title: "Successful!",
-      text: "Profile Updated successfuly",
-      icon: "success",
-      confirmButtonText: "Cool",
-    });
+    
   }
 
   return (
@@ -155,7 +128,7 @@ export default function Profile() {
                             <h5>Username</h5>
                             <input
                               type="text"
-                              value={userProfile.username}
+                              value={formInput.username}
                               className="form-control"
                               placeholder="Enter username"
                               onChange={(e) =>
@@ -170,7 +143,7 @@ export default function Profile() {
 
                             <h5>Bio</h5>
                             <textarea
-                              value={userProfile.bio}
+                              value={formInput.bio}
                               className="form-control"
                               placeholder="Tell the world who you are!"
                               onChange={(e) =>
@@ -186,7 +159,7 @@ export default function Profile() {
                             <h5>Email Address*</h5>
                             <input
                               type="text"
-                              value={userProfile.email}
+                              value={formInput.email}
                               className="form-control"
                               placeholder="Enter email"
                               onChange={(e) =>
@@ -204,7 +177,7 @@ export default function Profile() {
                             </h5>
                             <input
                               type="text"
-                              value={userProfile.siteUrl}
+                              value={formInput.site_url}
                               className="form-control"
                               placeholder="Enter Website URL"
                               onChange={(e) =>
@@ -222,7 +195,7 @@ export default function Profile() {
                             </h5>
                             <input
                               type="text"
-                              value={userProfile.twitterHandle}
+                              value={formInput.twitter_username}
                               className="form-control"
                               placeholder="Enter Twitter username"
                               onChange={(e) =>
@@ -241,7 +214,7 @@ export default function Profile() {
                             </h5>
                             <input
                               type="text"
-                              value={userProfile.igHandle}
+                              value={formInput.instagram_username}
                               className="form-control"
                               placeholder="Enter Instagram username"
                               onChange={(e) =>
@@ -265,21 +238,21 @@ export default function Profile() {
                             ></i>
                           </h5>
                           <img
-                                src={
-                                  fileUrl
-                                    ? fileUrl
-                                    : "images/author_single/author-9.jpg"
-                                }
-                                // src="images/author_single/author-9.jpg"
-                                id="click_profile_img"
-                                className="d-profile-img-edit img-fluid"
-                                alt=""
-                              />
-                              <input
-                                type="file"
-                                id="upload_profile_img"
-                                onChange={onProfileImage}
-                              />
+                            src={
+                              fileUrl
+                                ? fileUrl
+                                : "/images/author_single/author-9.jpg"
+                            }
+                            // src="images/author_single/author-9.jpg"
+                            id="click_profile_img"
+                            className="d-profile-img-edit img-fluid"
+                            alt=""
+                          />
+                          <input
+                            type="file"
+                            id="upload_profile_img"
+                            onChange={onProfileImage}
+                          />
 
                           <div className="spacer-30"></div>
 
@@ -320,4 +293,33 @@ export default function Profile() {
       </section>
     </>
   );
+}
+
+export async function getServerSideProps(context) {
+  const { address } = context.query;
+
+  let data = {
+    profile_pics:''
+  }
+  
+  // const res = await fetch(`http://localhost:3000/api/user/${address}`);
+  // if(res.json())
+  // {
+  //   data = await res.json();
+  // }
+
+  let res = await prisma.user.findUnique({
+    where:{
+        id:address
+    }
+  })
+
+  if(res)
+  {
+    data = res
+  }
+
+  return {
+    props: { data: data },
+  };
 }

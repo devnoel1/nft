@@ -10,9 +10,10 @@ import Web3Modal from "web3modal";
 import { providers, ethers } from "ethers";
 import WalletConnectProvider from "@walletconnect/web3-provider";
 import WalletLink from "walletlink";
-import { client } from "../lib/sanityClient";
+
 
 export const WalletContext = createContext(null);
+
 
 const INFURA_ID = "abc5c37ab01b4f1c8483dd8f1533bc9d";
 const providerOptions = {
@@ -118,61 +119,26 @@ function reducer(state: StateType, action: ActionType): StateType {
   }
 }
 
+
+
 export const WalletProvider = ({ children }) => {
   const [state, dispatch] = useReducer(reducer, initialState);
   const { provider, web3Provider, address, chainId } = state;
   const [balance, setBalance] = useState(null);
-  const [ currentUser, setCurrentUser] = useState({})
-  const [profileStatus, setProfileStatus] = useState(null)
+  const [currentUser, setCurrentUser] = useState({})
+
 
   useEffect(() => {
-    accountBalance();
-  }, []);
+    getUSer()
+  }, [getUSer]);
 
-useEffect(() => {
 
-  profile()
-  
-  }, [profile]);
+  async function getUSer()
+  {
+    const res = await fetch(`http://localhost:3000/api/user/${address}`)
+    const data = await res.json()
 
-  async function profile(){
-    const query = `
-        *[_type == "users" && _id == "${address}"]{
-            userName,
-            walletAddress,
-            bio,
-            email,
-            siteUrl,
-            twitterHandle,
-            igHandle,
-            profileImage
-        }
-        `;
-    const response = await client.fetch(query);
-
-    if (response.length) {
-      setCurrentUser({
-        username: response[0].userName,
-        bio: response[0].bio,
-        email: response[0].email,
-        siteUrl: response[0].siteUrl,
-        twitterHandle: response[0].twitterHandle,
-        profileImage:response[0].profileImage,
-        igHandle: response[0].igHandle,
-      });
-
-      setProfileStatus(true)
-    }else{
-      setProfileStatus(false)
-    }
-  }
-
-  async function accountBalance() {
-    if (web3Provider) {
-      const provide = new ethers.providers.Web3Provider(window.ethereum, "any");
-      const balance = provide.getBalance(address);
-      setBalance(balance);
-    }
+    setCurrentUser(data)
   }
 
   const connect = useCallback(async function () {
@@ -275,4 +241,4 @@ useEffect(() => {
       {children}
     </WalletContext.Provider>
   );
-};
+}
