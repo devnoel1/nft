@@ -11,6 +11,7 @@ import { nftaddress, nftmarketaddress } from "../config";
 
 //getting contract abis
 import { NFT, Market } from "../util/constant";
+import Link from "next/link";
 
 export default function Home() {
   const [nfts, setNfts] = useState([]);
@@ -165,6 +166,45 @@ export default function Home() {
                   </p>
                 </div>
                 <i className="wm icon_tags_alt"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section id="section-collections" className="no-bottom">
+        <div className="container">
+          <div className="row">
+            <div className="col-lg-12">
+              <div className="text-center">
+                <h2>Hot Collections</h2>
+                <div className="small-border bg-color-2"></div>
+              </div>
+            </div>
+            <div id="collection-carousel" className="owl-carousel wow fadeIn">
+
+              <div className="nft_coll">
+                <div className="nft_wrap">
+                  <Link href="collection">
+                  <a ><img src="/images/collections/coll-1.jpg" className="lazy img-fluid" alt=""/>
+                  
+                  </a>
+                  </Link>
+                </div>
+                <div className="nft_coll_pp">
+                  <Link href="collection">
+                  <a ><img className="lazy pp-coll" src="/images/author/author-1.jpg" alt=""/>
+                  <i className="fa fa-check"></i>
+                  </a>
+                 
+                  </Link>
+                </div>
+                <div className="nft_coll_info">
+                  <Link href="collection">
+                  <a ><h4>Abstraction</h4>
+                  </a>
+                  </Link>
+                  <span>ERC-192</span>
+                </div>
               </div>
             </div>
           </div>

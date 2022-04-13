@@ -41,13 +41,6 @@ const Navbar = () => {
                           width="167"
                           height="36"
                         />
-                        {/* <Image
-                      alt=""
-                      className="logo-2"
-                      src="/images/logo.png"
-                      width="167"
-                      height="36"
-                    /> */}
                       </a>
                     </Link>
                   </div>
@@ -103,7 +96,7 @@ const Navbar = () => {
                   <div className="de-login-menu">
                     {web3Provider ? (
                       <>
-                        <Link href="/create-item">
+                        <Link href="/create">
                           <a className="btn-main">
                             <i className="fa fa-plus"></i> <span> Create</span>
                           </a>
