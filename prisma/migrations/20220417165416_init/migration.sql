@@ -26,7 +26,12 @@ CREATE TABLE "Collection" (
 
 -- CreateTable
 CREATE TABLE "CollectionItem" (
-    "tokenId" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    "tokenId" TEXT,
+    "title" TEXT,
+    "pics" TEXT,
+    "price" TEXT,
+    "description" TEXT,
     "collectionId" INTEGER,
     "isListed" BOOLEAN NOT NULL DEFAULT false,
     CONSTRAINT "CollectionItem_collectionId_fkey" FOREIGN KEY ("collectionId") REFERENCES "Collection" ("id") ON DELETE CASCADE ON UPDATE CASCADE
@@ -34,3 +39,6 @@ CREATE TABLE "CollectionItem" (
 
 -- CreateIndex
 CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "CollectionItem_tokenId_key" ON "CollectionItem"("tokenId");

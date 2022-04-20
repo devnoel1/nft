@@ -37,7 +37,12 @@ model Collection{
 }
 
 model CollectionItem{
-  tokenId Int @id
+  id Int @id @default(autoincrement())
+  tokenId String? @unique
+  title String?
+  pics String?
+  price String?
+  description String?
   collection Collection? @relation(fields: [collectionId], references: [id], onDelete: Cascade)
   collectionId Int?
   isListed Boolean @default(false)

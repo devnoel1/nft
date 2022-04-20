@@ -7,7 +7,7 @@ export default function Create() {
         id="subheader"
         className="text-light"
         // data-bgimage="url(/images/background/subheader.jpg) top"
-        style={{ 'background': "url(/images/background/subheader.jpg) " }}
+        style={{ "background": "url(/images/background/subheader.jpg) " }}
       >
         <div className="center-y relative text-center">
           <div className="container">
@@ -30,13 +30,13 @@ export default function Create() {
             </p>
             <Link href="/create-item">
                 <a className="opt-create">
-                <img src="./images/misc/coll-single.png" alt="" />
+                <img src="/images/misc/coll-single.png" alt="" />
               <h3>Single</h3>
                 </a>
             </Link>
             <Link href="/create-multiple" >
                 <a className="opt-create">
-                <img src="./images/misc/coll-multiple.png" alt="" />
+                <img src="/images/misc/coll-multiple.png" alt="" />
               <h3>Multiple</h3>
                 </a>
             </Link>

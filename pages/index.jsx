@@ -5,6 +5,7 @@ import axios from "axios";
 import Web3Modal from "web3modal";
 import NFTCard from "../components/nftCard";
 import ColumnItems from "../components/ColumnItems";
+import Collections from "../components/Collections";
 
 //getting contract address
 import { nftaddress, nftmarketaddress } from "../config";
@@ -180,33 +181,8 @@ export default function Home() {
                 <div className="small-border bg-color-2"></div>
               </div>
             </div>
-            <div id="collection-carousel" className="owl-carousel wow fadeIn">
-
-              <div className="nft_coll">
-                <div className="nft_wrap">
-                  <Link href="collection">
-                  <a ><img src="/images/collections/coll-1.jpg" className="lazy img-fluid" alt=""/>
-                  
-                  </a>
-                  </Link>
-                </div>
-                <div className="nft_coll_pp">
-                  <Link href="collection">
-                  <a ><img className="lazy pp-coll" src="/images/author/author-1.jpg" alt=""/>
-                  <i className="fa fa-check"></i>
-                  </a>
-                 
-                  </Link>
-                </div>
-                <div className="nft_coll_info">
-                  <Link href="collection">
-                  <a ><h4>Abstraction</h4>
-                  </a>
-                  </Link>
-                  <span>ERC-192</span>
-                </div>
-              </div>
-            </div>
+            <Collections/>
+            
           </div>
         </div>
       </section>

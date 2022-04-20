@@ -82,6 +82,11 @@ export default function Profile({data}) {
     
   }
 
+  const handlePics = () => {
+    document.getElementById("upload_profile_img").click();
+  };
+
+
   return (
     <>
       <section
@@ -244,7 +249,7 @@ export default function Profile({data}) {
                                 : "/images/author_single/author-9.jpg"
                             }
                             // src="images/author_single/author-9.jpg"
-                            id="click_profile_img"
+                            onClick={handlePics}
                             className="d-profile-img-edit img-fluid"
                             alt=""
                           />
