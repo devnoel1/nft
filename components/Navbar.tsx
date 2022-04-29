@@ -121,7 +121,7 @@ const Navbar = () => {
                             <div id="de-submenu" className="de-submenu">
                               <div className="d-name">
                                 <h4 className="text-capitalize">
-                                  {currentUser.username}
+                                  {currentUser.username? currentUser.username: "unknown" }
                                 </h4>
                                 {/* <a href="profile.html">Set display name</a> */}
                               </div>

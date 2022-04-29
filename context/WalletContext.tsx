@@ -11,41 +11,39 @@ import { providers, ethers } from "ethers";
 import WalletConnectProvider from "@walletconnect/web3-provider";
 import WalletLink from "walletlink";
 
-
 export const WalletContext = createContext(null);
-
 
 const INFURA_ID = "abc5c37ab01b4f1c8483dd8f1533bc9d";
 const providerOptions = {
   /* See Provider Options Section */
-  walletconnect: {
-    package: WalletConnectProvider, // required
-    options: {
-      infuraId: INFURA_ID, // required
-    },
-  },
-  "custom-walletlink": {
-    display: {
-      logo: "https://play-lh.googleusercontent.com/PjoJoG27miSglVBXoXrxBSLveV6e3EeBPpNY55aiUUBM9Q1RCETKCOqdOkX2ZydqVf0",
-      name: "Coinbase",
-      description: "Connect to Coinbase Wallet (not Coinbase App)",
-    },
-    options: {
-      appName: "Coinbase", // Your app name
-      networkUrl: `https://mainnet.infura.io/v3/${INFURA_ID}`,
-      chainId: 1,
-    },
-    package: WalletLink,
-    connector: async (_, options) => {
-      const { appName, networkUrl, chainId } = options;
-      const walletLink = new WalletLink({
-        appName,
-      });
-      const provider = walletLink.makeWeb3Provider(networkUrl, chainId);
-      await provider.enable();
-      return provider;
-    },
-  },
+  // walletconnect: {
+  //   package: WalletConnectProvider, // required
+  //   options: {
+  //     infuraId: INFURA_ID, // required
+  //   },
+  // },
+  // "custom-walletlink": {
+  //   display: {
+  //     logo: "https://play-lh.googleusercontent.com/PjoJoG27miSglVBXoXrxBSLveV6e3EeBPpNY55aiUUBM9Q1RCETKCOqdOkX2ZydqVf0",
+  //     name: "Coinbase",
+  //     description: "Connect to Coinbase Wallet (not Coinbase App)",
+  //   },
+  //   options: {
+  //     appName: "Coinbase", // Your app name
+  //     networkUrl: `https://mainnet.infura.io/v3/${INFURA_ID}`,
+  //     chainId: 1,
+  //   },
+  //   package: WalletLink,
+  //   connector: async (_, options) => {
+  //     const { appName, networkUrl, chainId } = options;
+  //     const walletLink = new WalletLink({
+  //       appName,
+  //     });
+  //     const provider = walletLink.makeWeb3Provider(networkUrl, chainId);
+  //     await provider.enable();
+  //     return provider;
+  //   },
+  // },
 };
 
 let web3Modal;
@@ -119,52 +117,44 @@ function reducer(state: StateType, action: ActionType): StateType {
   }
 }
 
-
-
 export const WalletProvider = ({ children }) => {
   const [state, dispatch] = useReducer(reducer, initialState);
   const { provider, web3Provider, address, chainId } = state;
-  const [balance, setBalance] = useState(null);
-  const [currentUser, setCurrentUser] = useState({})
-
-
-  useEffect(() => {
-    getUSer()
-  }, [getUSer]);
-
-
-  async function getUSer()
-  {
-    const res = await fetch(`http://localhost:3000/api/user/${address}`)
-    const data = await res.json()
-
-    setCurrentUser(data)
-  }
+  const [balance, setBalance] = useState(0);
+  const [currentUser, setCurrentUser] = useState({});
 
   const connect = useCallback(async function () {
-    // This is the initial `provider` that is returned when
-    // using web3Modal to connect. Can be MetaMask or WalletConnect.
-    const provider = await web3Modal.connect();
+    try {
+      // This is the initial `provider` that is returned when
+      // using web3Modal to connect. Can be MetaMask or WalletConnect.
+      const provider = await web3Modal.connect();
 
-    // We plug the initial `provider` into ethers.js and get back
-    // a Web3Provider. This will add on methods from ethers.js and
-    // event listeners such as `.on()` will be different.
-    const web3Provider = new providers.Web3Provider(provider);
+      // We plug the initial `provider` into ethers.js and get back
+      // a Web3Provider. This will add on methods from ethers.js and
+      // event listeners such as `.on()` will be different.
+      const web3Provider = new providers.Web3Provider(provider);
 
-    const signer = web3Provider.getSigner();
-    const address = await signer.getAddress();
+      const signer = web3Provider.getSigner();
+      const address = await signer.getAddress();
 
-    const network = await web3Provider.getNetwork();
+      const network = await web3Provider.getNetwork();
 
-    // setConnection(provider)
+      // setConnection(provider)
 
-    dispatch({
-      type: "SET_WEB3_PROVIDER",
-      provider,
-      web3Provider,
-      address,
-      chainId: network.chainId,
-    });
+      dispatch({
+        type: "SET_WEB3_PROVIDER",
+        provider,
+        web3Provider,
+        address,
+        chainId: network.chainId,
+      });
+
+      fetchBalance(web3Provider, address);
+
+      getUser(address);
+    } catch (error) {
+      console.log("user denied ERROR: " + error);
+    }
   }, []);
 
   const disconnect = useCallback(
@@ -179,6 +169,36 @@ export const WalletProvider = ({ children }) => {
     },
     [provider]
   );
+
+  const getUser = useCallback(async () => {
+    const res = await fetch(`/api/user/${address}`);
+    const data = await res.json();
+
+    // console.log(data)
+
+    if (data.status == "success") {
+      setCurrentUser(data.data);
+    } else if (data.status == "error") {
+      console.log(data);
+    }
+  }, []);
+
+  const fetchBalance = useCallback(async (netprovider, WalletAddresses) => {
+    const rawBalance = await netprovider.getBalance(WalletAddresses);
+    const value = parseFloat(ethers.utils.formatEther(rawBalance));
+    // console.log(value)
+    setBalance(value);
+  }, []);
+
+  //get balance
+  // useEffect(()=>{
+  //   fetchBalance(web3Provider,address)
+  // },[fetchBalance])
+
+  //get currenly login user
+  useEffect(() => {
+    getUser();
+  }, [getUser]);
 
   // Auto connect to the cached provider
   useEffect(() => {
@@ -199,6 +219,8 @@ export const WalletProvider = ({ children }) => {
           type: "SET_ADDRESS",
           address: accounts[0],
         });
+        fetchBalance(web3Provider, accounts[0]);
+        getUser();
       };
 
       // https://docs.ethers.io/v5/concepts/best-practices/#best-practices--network-changes
@@ -241,4 +263,4 @@ export const WalletProvider = ({ children }) => {
       {children}
     </WalletContext.Provider>
   );
-}
+};

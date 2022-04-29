@@ -6,6 +6,7 @@ import Web3Modal from "web3modal";
 import NFTCard from "../components/nftCard";
 import ColumnItems from "../components/ColumnItems";
 import Collections from "../components/Collections";
+import CarouselCollection from "../components/CarouselCollecction";
 
 //getting contract address
 import { nftaddress, nftmarketaddress } from "../config";
@@ -104,13 +105,15 @@ export default function Home() {
                   blockchain
                 </p>
                 <div className="spacer-10"></div>
-                <a
-                  href="explore.html"
-                  className="btn-main wow fadeInUp lead"
-                  data-wow-delay="1.25s"
-                >
-                  Browse MarketPlace
-                </a>
+                <Link href="/marketplace">
+                  <a
+                    className="btn-main wow fadeInUp lead"
+                    data-wow-delay="1.25s"
+                  >
+                    Browse MarketPlace
+                  </a>
+                </Link>
+
                 <div className="mb-sm-30"></div>
               </div>
               <div className="col-md-6 xs-hide">
@@ -172,17 +175,16 @@ export default function Home() {
           </div>
         </div>
       </section>
-      <section id="section-collections" className="no-bottom">
-        <div className="container">
-          <div className="row">
-            <div className="col-lg-12">
-              <div className="text-center">
-                <h2>Hot Collections</h2>
-                <div className="small-border bg-color-2"></div>
-              </div>
+      <section className="container no-bottom">
+        <div className="row">
+          <div className="col-lg-12">
+            <div className="text-center">
+              <h2>Hot Collections</h2>
+              <div className="small-border"></div>
             </div>
-            <Collections/>
-            
+          </div>
+          <div className="col-lg-12">
+            <CarouselCollection />
           </div>
         </div>
       </section>
@@ -191,7 +193,7 @@ export default function Home() {
           <div className="row">
             <div className="col-lg-12">
               <div className="text-center">
-                <h2>All Collections</h2>
+                <h2>New Items</h2>
                 <div className="small-border bg-color-2"></div>
               </div>
               <ColumnItems />

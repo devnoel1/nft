@@ -19,10 +19,30 @@ import Footer from "../components/footer";
 import Navbar from "../components/Navbar";
 import Script from "next/script";
 import { WalletProvider } from "../context/WalletContext";
+import { transitions, positions, Provider as AlertProvider } from "react-alert";
+import AlertTemplate from "react-alert-template-basic";
+import NextNProgress from "nextjs-progressbar";
+
+// AlertProvider options
+const alertProviderOptions = {
+  position: positions.BOTTOM_CENTER,
+  timeout: 5000,
+  offset: "40px",
+  transition: transitions.SCALE,
+};
+
 
 function MyApp({ Component, pageProps }) {
   return (
     <>
+    {/** NPROGRESS LOADER */}
+    <NextNProgress
+        color="#00008b"
+        startPosition={0.3}
+        stopDelayMs={200}
+        height={5}
+        showOnShallow={true}
+      />
       <Head>
         <link
           rel="icon"
@@ -41,8 +61,10 @@ function MyApp({ Component, pageProps }) {
         <div id="top"></div>
         <div className="no-bottom no-top" id="content">
           <WalletProvider>
-            <Navbar />
-            <Component {...pageProps} />
+            <AlertProvider template={AlertTemplate} {...alertProviderOptions}>
+              <Navbar />
+              <Component {...pageProps} />
+            </AlertProvider>
           </WalletProvider>
         </div>
         <Footer />

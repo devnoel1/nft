@@ -15,12 +15,11 @@ const ColumnItems = () => {
   const [nftSlice, setNftSlice] = useState([]);
   const [nfts, setNfts] = useState([]);
   const [filteredData, setFilteredData] = useState(nfts);
-  const [loadingState, setLoadingState] = useState("not-loaded");
+  const [loadingState, setLoadingState] = useState("loading");
 
   useEffect(() => {
     loadNFTs();
   }, []);
-
 
   async function loadNFTs() {
     /* create a generic provider and query for unsold market items */
@@ -68,14 +67,14 @@ const ColumnItems = () => {
     let value = event.target.value;
     let result = [];
 
-    result = nfts.filter((data)=>{
+    result = nfts.filter((data) => {
       if (value !== "") {
-        return data?.name?.toLowerCase()?.includes(value?.toLowerCase())
+        return data?.name?.toLowerCase()?.includes(value?.toLowerCase());
       }
-      return data
-    })
+      return data;
+    });
     setFilteredData(result);
-  }
+  };
 
   const loadMore = () => {
     let nftState = filteredData;
@@ -108,28 +107,36 @@ const ColumnItems = () => {
           </div>
         </form>
       </div>
-      {loadingState === "loaded" && !filteredData.length ? (
-        <h4 className="py-10 px-20 text-3xl text-center text-warning">
-          no result found
-        </h4>
+      {loadingState == "loading" ? (
+        <div className="d-flex justify-content-center">
+          <img src="/images/loading.gif" alt="" />
+        </div>
       ) : (
-        <div className="row">
-          {filteredData.map((nft, i) => (
-            <NFTCard key={i} nft={nft} loadNFTs={loadNFTs} />
-          ))}
-        </div>
+        <>
+          {loadingState === "loaded" && !filteredData.length ? (
+            <h4 className="py-10 px-20 text-3xl text-center text-warning">
+              no result found
+            </h4>
+          ) : (
+            <div className="row">
+              {filteredData.map((nft, i) => (
+                <NFTCard key={i} nft={nft} loadNFTs={loadNFTs} />
+              ))}
+            </div>
+          )}
+          {/* {filteredData.length !== nftSlice.length && (
+    <div class="col-md-12 text-center">
+      <button
+        type="button"
+        onClick={() => loadMore()}
+        class="btn-main wow fadeInUp lead"
+      >
+        Load more
+      </button>
+    </div>
+  )} */}
+        </>
       )}
-      {/* {filteredData.length !== nftSlice.length && (
-        <div class="col-md-12 text-center">
-          <button
-            type="button"
-            onClick={() => loadMore()}
-            class="btn-main wow fadeInUp lead"
-          >
-            Load more
-          </button>
-        </div>
-      )} */}
     </>
   );
 };

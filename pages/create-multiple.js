@@ -46,48 +46,54 @@ const ipfs_client = ipfsHttpClient("https://ipfs.infura.io:5001/api/v0");
 export default function CreateMultiple() {
   const [modalFormOpen, setModalFormOpen] = useState(false);
   const { address, currentUser } = useContext(WalletContext);
-  const [collections,setCollections] = useState({});
-  const [loaded,setLoaded] = useState(false);
-  const [fileUrl, setFileUrl] = useState(null)
-  const [formInput, updateFormInput] = useState({ price: '', name: '', description: '',collection:'' })
-  
+  const [collections, setCollections] = useState({});
+  const [loaded, setLoaded] = useState(false);
+  const [fileUrl, setFileUrl] = useState(null);
+  const [formInput, updateFormInput] = useState({
+    price: "",
+    name: "",
+    description: "",
+    collection: "",
+  });
+
   useEffect(() => {
     getCollections();
   }, []);
 
-  async function getCollections () {
+  async function getCollections() {
     // const data = await fetch()
-    const data = await axios.get('/api/collection');
-  
-    if(data.status == 200 && data.data)
-    {
+    const data = await axios.get("/api/collection");
+
+    const collectionList = data?.data != "" ? data?.data : [];
+
+    if (collectionList.status == "success") {
       const items = await Promise.all(
-        data.data.map(async (i)=>{
+        collectionList.data.map(async (i) => {
+          const user = await axios.get(`/api/user/${i.userId}`);
+          
           let item = {
-            id:i.id,
-            title:i.title,
-            symbol:i.symbol,
-            pics:i.pics,
-            user:i.userId
-          }
+            id: i._id,
+            title: i.title,
+            symbol: i.symbol,
+            pics: i.pics,
+            user: i.userId,
+            userPics: user.data.profile_pics,
+            username: user.data.username,
+          };
           return item;
         })
-      )
+      );
 
-      if(address)
-      {
-        const collectionItems = items.filter(i=>i.user == address)
-      
-        setCollections(collectionItems)
-        setLoaded(true)
-      }
-      
-    }else{
-      setCollections({})
-      setLoaded(false)
+      if (address) {
+        const collectionItems = items.filter((i) => i.user == address);
+
+        setCollections(collectionItems);
+        setLoaded(true);
+      } 
+    } else {
+      console.log(collectionList);
     }
-  };
-
+  }
 
   async function onChange(e) {
     const file = e.target.files[0];
@@ -100,32 +106,31 @@ export default function CreateMultiple() {
     } catch (error) {
       console.log("Error uploading file: ", error);
     }
-    
   }
 
-  async function createItem()
-  {
-    const { name, description, price,collection } = formInput
-    
+  async function createItem() {
+    const { name, description, price, collection } = formInput;
+
     if (!name || !description || !fileUrl || !collection) return;
 
-    await axios.post('/api/collectionItem',{
-      title:name,
-      description:description,
-      price:price,
-      collectionId:parseInt(collection),
-      pics:fileUrl,
-    }).then(data=>{
-      // console.log(data)
-      if(data.status == 200)
-        {
+    await axios
+      .post("/api/collectionItem", {
+        title: name,
+        description: description,
+        price: price,
+        collectionId: collection,
+        pics: fileUrl,
+      })
+      .then((data) => {
+        // console.log(data)
+        if (data.data.status == "success") {
           Swal.fire({
             title: "Successful!",
-            text: data.message,
+            text: data.data.message,
             icon: "success",
             confirmButtonText: "Cool",
           });
-        }else if(data.status == 500){
+        } else if (data.data.status == "error") {
           Swal.fire({
             title: "Not Successful!",
             text: "Something went wrong ",
@@ -133,10 +138,11 @@ export default function CreateMultiple() {
             confirmButtonText: "Cool",
           });
         }
-    }).catch(error=>{
-      console.log(error)
-    })
-  } 
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }
 
   const handlePics = () => {
     document.getElementById("upload_file").click();
@@ -178,11 +184,7 @@ export default function CreateMultiple() {
                       className="btn-main"
                       value="Browse"
                     />
-                    <input
-                      id="upload_file"
-                      type="file"
-                      onChange={onChange}
-                    />
+                    <input id="upload_file" type="file" onChange={onChange} />
                   </div>
                 </div>
                 <div className="spacer-single"></div>
@@ -194,25 +196,41 @@ export default function CreateMultiple() {
                         <i className="fa fa-plus"></i>Create
                       </span>
                     </li>
-                    {
-                      !loaded && !collections.length ? (<li><h6>no collection</h6></li>):(
-                        <span>
-                          {
-                          collections.map((item,i)=>(
-                            <li key={i}>
+                    {!loaded && !collections.length ? (
+                      <li>
+                        <h6>no collection</h6>
+                      </li>
+                    ) : (
+                      <span>
+                        {collections.map((item, i) => (
+                          <li key={i}>
                             <label className="radio-label">
-                              <input type="checkbox"  value={item.id} onChange={e => updateFormInput({ ...formInput, collection: e.target.value })} hidden />
+                              <input
+                                type="checkbox"
+                                value={item.id}
+                                onChange={(e) =>
+                                  updateFormInput({
+                                    ...formInput,
+                                    collection: e.target.value,
+                                  })
+                                }
+                                hidden
+                              />
                               <span className="checkmark">
-                                <img src={item.pics} className="rounded-circle" alt="" height="45" width="45" />
+                                <img
+                                  src={item.pics}
+                                  className="rounded-circle"
+                                  alt=""
+                                  height="45"
+                                  width="45"
+                                />
                                 <h6 className="mt-2 mb-0">{item.title}</h6>
                               </span>
                             </label>
                           </li>
-                          ))
-                        }
-                        </span>
-                      )
-                    }
+                        ))}
+                      </span>
+                    )}
                   </ul>
                 </div>
 
@@ -224,7 +242,6 @@ export default function CreateMultiple() {
                   name="item_title"
                   id="item_title"
                   className="form-control"
-                  
                   placeholder="e.g. 'Crypto Funk"
                   onChange={(e) =>
                     updateFormInput({ ...formInput, name: e.target.value })
@@ -241,7 +258,10 @@ export default function CreateMultiple() {
                   className="form-control"
                   placeholder="e.g. 'This is very limited item'"
                   onChange={(e) =>
-                    updateFormInput({ ...formInput, description: e.target.value })
+                    updateFormInput({
+                      ...formInput,
+                      description: e.target.value,
+                    })
                   }
                 ></textarea>
 
@@ -278,7 +298,9 @@ export default function CreateMultiple() {
               <div className="nft__item_wrap">
                 <span>
                   <img
-                    src={fileUrl ?  fileUrl:"/images/collections/coll-item-3.jpg"}
+                    src={
+                      fileUrl ? fileUrl : "/images/collections/coll-item-3.jpg"
+                    }
                     id="get_file_2"
                     className="lazy nft__item_preview"
                     alt=""

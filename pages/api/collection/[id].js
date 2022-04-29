@@ -1,16 +1,19 @@
-import prisma from "../../../lib/prisma";
+import dbConnect from "../../../util/dbConfig";
+import Collection from "../../../models/Collection";
 
-export default async (req, res) => {
+dbConnect();
+
+const SinleCollection = async (req, res) => {
   const { id } = req.query;
 
   try {
-    const data = await prisma.collection.findMany();
-    const updatedData = JSON.stringify(data, (_, v) => typeof v === 'bigint' ? `${v}n` : v)
-    .replace(/"(-?\d+)n"/g, (_, a) => a);
+    const data = await Collection.findById(id);
 
-    return res.status(200).json(updatedData);
+    return res.status(200).send({ status: "success", data: data });
   } catch (error) {
     res.status = 500;
-    res.send({ error: true, message: error.message });
+    res.send({ status: "error", message: error.message });
   }
 };
+
+export default SinleCollection;

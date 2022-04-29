@@ -1,33 +1,35 @@
-import prisma from "../../../lib/prisma";
+import dbConnect from "../../../util/dbConfig";
+import Collection from "../../../models/Collection";
 
-export default async (req, res) => {
+dbConnect();
 
+async function CollectionApi(req, res) {
   if (req.method == "POST") {
-
-    await prisma.collection.create({
-        data:{
-            title: req.body.name,
-            symbol: req.body.symbol,
-            desription: req.body.description,
-            pics: req.body.pics,
-            userId: req.body.address,
-          }
-    });
-
-    return res.status(200).json({ message: "collection created successfuly" });
-
-  } else if (req.method == "GET") {
-
     try {
-      const data = await prisma.collection.findMany();
-      const updatedData = JSON.stringify(data, (_, v) => typeof v === 'bigint' ? `${v}n` : v)
-      .replace(/"(-?\d+)n"/g, (_, a) => a);
-  
-      return res.status(200).json(updatedData);
+      await Collection.create({
+        title: req.body.name,
+        symbol: req.body.symbol,
+        description: req.body.description,
+        pics: req.body.pics,
+        userId: req.body.address,
+      });
+      return res
+        .status(200)
+        .send({ status: "success", message: "collection created successfuly" });
     } catch (error) {
       res.status = 500;
-      res.send({ error: true, message: error.message });
+      res.send({ status: 'error', message: error.message });
     }
+  } else if (req.method == "GET") {
+    try {
+      const data = await Collection.find({});
 
+      return res.status(200).send({ status: "success", data: data });
+    } catch (error) {
+      res.status = 500;
+      res.send({ status: "error", message: error.message });
+    }
   }
-};
+}
+
+export default CollectionApi;

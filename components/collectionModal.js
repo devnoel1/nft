@@ -40,12 +40,13 @@ export default function CollectionModal({ modalFormOpen, setModalFormOpen,getCol
       symbol: symbol,
       description: description,
     }).then(function (data) {
+      // console.log(data)
         
-        if(data.status == 200)
+        if(data.data.status == "success")
         {
           Swal.fire({
             title: "Successful!",
-            text: data.message,
+            text: data.data.message,
             icon: "success",
             confirmButtonText: "Cool",
           });

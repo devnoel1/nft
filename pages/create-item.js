@@ -5,6 +5,8 @@ import { useRouter } from "next/router";
 import Web3Modal from "web3modal";
 import { WalletContext } from "../context/WalletContext";
 import Swal from "sweetalert2";
+import { useAlert } from "react-alert";
+import { ValidationErr } from "../components/ValidationError";
 
 const client = ipfsHttpClient("https://ipfs.infura.io:5001/api/v0");
 
@@ -13,15 +15,21 @@ import { nftaddress, nftmarketaddress } from "../config";
 import { NFT, Market } from "../util/constant";
 
 export default function CreateItem() {
+  const { address, currentUser, web3Provider, balance } =
+    useContext(WalletContext);
   const [fileUrl, setFileUrl] = useState(null);
+  const [titleErr, setTitleErr] = useState(null);
+  const [priceErr, setPriceErr] = useState(null);
+  const [fileErr, setFileErr] = useState(null);
   const [formInput, updateFormInput] = useState({
     price: "",
     name: "",
     description: "",
   });
 
-  const connection = useContext(WalletContext);
-  // const web3Provider = useContext(ConnectionContext);
+  // Define alert
+  const alert = useAlert();
+
   const router = useRouter();
 
   async function onChange(e) {
@@ -38,7 +46,24 @@ export default function CreateItem() {
   }
   async function createMarket() {
     const { name, description, price } = formInput;
-    if (!name || !description || !price || !fileUrl) return;
+
+    if (!name) {
+      setTitleErr(true);
+    }
+
+    if (!price) {
+      setPriceErr(true);
+    }
+
+    if (!fileUrl) {
+      setFileErr(true);
+    }
+
+    if (!name || !price || !fileUrl) return;
+
+    if (price >= balance) {
+      alert.error("insufficient funds for gas * price");
+    }
     /* first, upload to IPFS */
     const data = JSON.stringify({
       name,
@@ -56,12 +81,7 @@ export default function CreateItem() {
   }
 
   async function createSale(url) {
-    // const web3Modal = new Web3Modal()
-    // const connection = await web3Modal.connect()
-    // const provider = new ethers.providers.Web3Provider(connection)
-    // const signer = provider.getSigner()
-
-    const signer = connection.web3Provider.getSigner();
+    const signer = web3Provider.getSigner();
 
     /* next, create the item */
     let contract = new ethers.Contract(nftaddress, NFT.abi, signer);
@@ -80,15 +100,15 @@ export default function CreateItem() {
     transaction = await contract.createMarketItem(nftaddress, tokenId, price, {
       value: listingPrice,
     });
+
     await transaction.wait();
-    Swal.fire({
-      title: "Successful!",
-      text: "ITem Created Successfuly",
-      icon: "success",
-      confirmButtonText: "Cool",
-    });
+    alert.success("Item added successfuly");
     router.push("/");
   }
+
+  const handlePics = () => {
+    document.getElementById("upload_file").click();
+  };
 
   return (
     <>
@@ -126,12 +146,13 @@ export default function CreateItem() {
                     <p id="file_name">PNG, JPG, GIF, WEBP or MP4. Max 200mb.</p>
                     <input
                       type="button"
-                      id="get_file"
                       className="btn-main"
                       value="Browse"
+                      onClick={handlePics}
                     />
                     <input type="file" id="upload_file" onChange={onChange} />
                   </div>
+                  {fileErr && <ValidationErr msg={"file field is required"} />}
                   <div className="spacer-single"></div>
                   <h5>Title</h5>
                   <input
@@ -142,6 +163,7 @@ export default function CreateItem() {
                       updateFormInput({ ...formInput, name: e.target.value })
                     }
                   />
+                  {fileErr && <ValidationErr msg={"title field is required"} />}
                   <div className="spacer-single"></div>
                   <h5>Description</h5>
                   <textarea
@@ -178,7 +200,9 @@ export default function CreateItem() {
                           }
                         />
                       </div>
-
+                      {fileErr && (
+                        <ValidationErr msg={"price field is required"} />
+                      )}
                       <div id="tab_opt_3"></div>
                     </div>
                   </div>
@@ -198,9 +222,11 @@ export default function CreateItem() {
             </div>
             <div className="col-lg-3 col-sm-6 col-xs-12">
               <h5>Preview Image</h5>
-              {fileUrl && (
-                <img className="rounded mt-4" width="350" src={fileUrl} />
-              )}
+              <img
+                className="rounded mt-4"
+                width="350"
+                src={fileUrl ? fileUrl : "/images/default.png"}
+              />
             </div>
           </div>
         </div>
