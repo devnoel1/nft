@@ -25,8 +25,8 @@ export default function Create() {
         <div className="row">
           <div className="col-md-6 offset-md-3">
             <p>
-              Choose "Single" if you want your collectible to be one of a kind
-              or "Multiple" if you want to sell one collectible times
+              Choose Single if you want your collectible to be one of a kind
+              or Multiple if you want to sell one collectible times
             </p>
             <Link href="/create-item">
                 <a className="opt-create">
