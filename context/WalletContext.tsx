@@ -151,7 +151,7 @@ export const WalletProvider = ({ children }) => {
 
       fetchBalance(web3Provider, address);
 
-      getUser(address);
+      getUser();
     } catch (error) {
       console.log("user denied ERROR: " + error);
     }
