@@ -1,11 +1,11 @@
-import { useState, useContext, useEffect,useRef } from "react";
+import { useState, useContext, useEffect, useRef } from "react";
 import { useRouter } from "next/router";
 import { create as ipfsHttpClient } from "ipfs-http-client";
 import { WalletContext } from "../../context/WalletContext";
 import Swal from "sweetalert2";
 import axios from "axios";
 import { baseURL } from "../../config";
-import UserProfile from '../../components/Profile'
+import UserProfile from "../../components/Profile";
 
 const ipfs_client = ipfsHttpClient("https://ipfs.infura.io:5001/api/v0");
 
@@ -22,22 +22,20 @@ export default function Profile() {
     if (!router.isReady) return;
     const wallet_address = router.query.address;
 
-    // console.log(wallet_address)
-    getUser(wallet_address)
-    // On mount
     isMounted.current = true;
 
-    
+    // console.log(wallet_address)
+    getUser(wallet_address);
+    // On mount
 
     return () => (isMounted.current = false);
   });
 
-  async function getUser(wallet_address)
-  {
+  async function getUser(wallet_address) {
     const datalist = await axios.get(`/api/user/${wallet_address}`);
-      const usersProfile = datalist?.data != "" ? datalist?.data : [];
-      // console.log(usersProfile)
-      setUserProfile(usersProfile.data);
+    const usersProfile = datalist?.data != "" ? datalist?.data : [];
+    // console.log(usersProfile)
+    setUserProfile(usersProfile.data);
   }
 
   return (
@@ -59,7 +57,7 @@ export default function Profile() {
           </div>
         </div>
       </section>
-      <UserProfile data={userProfile}/>
+      <UserProfile data={userProfile} />
     </>
   );
 }

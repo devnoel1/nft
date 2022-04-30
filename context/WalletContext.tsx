@@ -170,18 +170,17 @@ export const WalletProvider = ({ children }) => {
     [provider]
   );
 
-  const getUser = useCallback(async () => {
+  const getUser = async () => {
     const res = await fetch(`/api/user/${address}`);
     const data = await res.json();
 
-    // console.log(data)
-
     if (data.status == "success") {
+      // console.log(data);
       setCurrentUser(data.data);
     } else if (data.status == "error") {
       console.log(data);
     }
-  }, []);
+  };
 
   const fetchBalance = useCallback(async (netprovider, WalletAddresses) => {
     const rawBalance = await netprovider.getBalance(WalletAddresses);

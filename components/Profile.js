@@ -8,7 +8,7 @@ const ipfs_client = ipfsHttpClient("https://ipfs.infura.io:5001/api/v0");
 export default function UserProfile({data}){
   const [fileUrl, setFileUrl] = useState(data?.profile_pics || null);
   const [formInput, updateFormInput] = useState({
-    username: data?.username || "",
+    username: data.username || "",
     email: data?.email || "",
     bio: data?.bio || "",
     site_url: data?.site_url || "",

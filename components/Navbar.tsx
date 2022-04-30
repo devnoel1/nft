@@ -160,7 +160,7 @@ const Navbar = () => {
                                 </li>
                                 <li>
                                   <a
-                                    href="javascript:void(0);"
+                                    href=""
                                     onClick={disconnect}
                                   >
                                     <i className="fa fa-sign-out"></i> Sign
